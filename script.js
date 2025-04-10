@@ -14,21 +14,41 @@ upload.addEventListener('change', (e) => {
   reader.onload = function(event) {
     const img = new Image();
     img.onload = function() {
-      // Tamanho final desejado
       const outputSize = 1080;
       canvas.width = outputSize;
       canvas.height = outputSize;
 
-      // Dimensões da imagem original
       const { width, height } = img;
-
-      // Cálculo para cortar a imagem ao centro e manter aspecto
-      const side = Math.min(width, height); // pega o menor lado
+      const side = Math.min(width, height);
       const startX = (width - side) / 2;
       const startY = (height - side) / 2;
 
-      // Limpa o canvas
+      // Desenha imagem recortada
       ctx.clearRect(0, 0, outputSize, outputSize);
+      ctx.drawImage(img, startX, startY, side, side, 0, 0, outputSize, outputSize);
 
-      // Desenha a imagem recortada, redimensionada para 1080x1080
-      ctx.drawImage(img, startX, startY, side, side, 0, 0
+      // Quando a moldura estiver pronta, desenha por cima e mostra preview
+      const drawFinalImage = () => {
+        ctx.drawImage(moldura, 0, 0, outputSize, outputSize);
+        canvas.style.display = 'block';
+        downloadBtn.disabled = false;
+        downloadBtn.style.display = 'inline-block';
+      };
+
+      if (moldura.complete) {
+        drawFinalImage();
+      } else {
+        moldura.onload = drawFinalImage;
+      }
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+downloadBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'foto_campanha.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
