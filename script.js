@@ -3,7 +3,6 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const downloadBtn = document.getElementById('download');
 
-// Carrega a moldura
 const moldura = new Image();
 moldura.src = 'moldura.png';
 
@@ -15,38 +14,21 @@ upload.addEventListener('change', (e) => {
   reader.onload = function(event) {
     const img = new Image();
     img.onload = function() {
-      // Define o tamanho do canvas baseado na imagem
-      const width = 1080;
-      const height = 1080;
-      canvas.width = width;
-      canvas.height = height;
+      // Tamanho final desejado
+      const outputSize = 1080;
+      canvas.width = outputSize;
+      canvas.height = outputSize;
 
-      // Desenha a imagem do usuário
-      ctx.clearRect(0, 0, width, height);
-      ctx.drawImage(img, 0, 0, width, height);
+      // Dimensões da imagem original
+      const { width, height } = img;
 
-      // Desenha a moldura por cima
-      moldura.onload = () => {
-        ctx.drawImage(moldura, 0, 0, width, height);
-        canvas.style.display = 'block';
-        downloadBtn.disabled = false;
-      };
+      // Cálculo para cortar a imagem ao centro e manter aspecto
+      const side = Math.min(width, height); // pega o menor lado
+      const startX = (width - side) / 2;
+      const startY = (height - side) / 2;
 
-      // Se a moldura já estiver carregada, desenha imediatamente
-      if (moldura.complete) {
-        ctx.drawImage(moldura, 0, 0, width, height);
-        canvas.style.display = 'block';
-        downloadBtn.disabled = false;
-      }
-    };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
-});
+      // Limpa o canvas
+      ctx.clearRect(0, 0, outputSize, outputSize);
 
-downloadBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = 'foto_campanha.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-});
+      // Desenha a imagem recortada, redimensionada para 1080x1080
+      ctx.drawImage(img, startX, startY, side, side, 0, 0
