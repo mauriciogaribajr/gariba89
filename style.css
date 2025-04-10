@@ -60,5 +60,5 @@ canvas {
   margin-top: 20px;
   max-width: 100%;
   border-radius: 10px;
-  touch-action: none; /* evita rolagem durante drag no mobile */
+  touch-action: none; /* importante pro mobile */
 }
